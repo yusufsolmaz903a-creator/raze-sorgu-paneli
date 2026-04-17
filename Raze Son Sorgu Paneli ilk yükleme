@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Raze Son Sorgu Paneli - 2026</title>
+  <style>
+    body {
+      margin: 0; padding: 0; font-family: Arial, sans-serif;
+      background: linear-gradient(135deg, #0f0c29, #302b63, #24243e);
+      color: white; min-height: 100vh;
+    }
+    .container {
+      max-width: 960px; 
+      margin: 15px auto; 
+      padding: 10px 15px;
+    }
+    header {
+      text-align: center; 
+      margin-bottom: 25px;
+    }
+    h1 { 
+      margin: 0; 
+      font-size: 28px; 
+      text-shadow: 0 0 10px #ff00ff;
+    }
+    .subtitle { 
+      font-size: 16px; 
+      opacity: 0.9; 
+      color: #00ffcc;
+      margin-top: 5px;
+    }
+
+    .menu {
+      display: grid; 
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 12px;
+    }
+    .button {
+      background: rgba(255,255,255,0.12);
+      border: 1px solid rgba(0,255,200,0.3);
+      border-radius: 16px;
+      padding: 20px 16px; 
+      font-size: 17.5px; 
+      color: white;
+      cursor: pointer; 
+      transition: all 0.3s;
+      display: flex; 
+      align-items: center; 
+      gap: 14px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+      min-height: 70px;
+    }
+    .button:hover, .button:active {
+      background: rgba(0,255,200,0.18);
+      border-color: #00ffcc;
+      transform: scale(1.03);
+    }
+    .emoji { font-size: 28px; }
+
+    .result {
+      margin-top: 25px; 
+      background: rgba(0,0,0,0.65);
+      border: 1px solid #00ffcc;
+      border-radius: 16px; 
+      padding: 22px; 
+      display: none; 
+      line-height: 1.7;
+      font-size: 16px;
+    }
+    input, button {
+      padding: 16px; 
+      margin: 10px 0; 
+      border-radius: 12px; 
+      border: none;
+      width: 100%; 
+      font-size: 17px;
+      box-sizing: border-box;
+    }
+    input { 
+      background: #fff; 
+      color: #000; 
+    }
+    button { 
+      background: #00ff88; 
+      color: black; 
+      font-weight: bold; 
+      cursor: pointer; 
+    }
+    button:hover, button:active { background: #00cc66; }
+    .back { background: #ff3366; color: white; }
+
+    /* Müzik Kontrol Butonu - Mobil dostu */
+    .music-control {
+      position: fixed;
+      bottom: 15px;
+      right: 15px;
+      background: rgba(0,0,0,0.75);
+      border: 2px solid #00ffcc;
+      color: #00ffcc;
+      padding: 14px 20px;
+      border-radius: 50px;
+      font-size: 15px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0 0 15px rgba(0,255,200,0.6);
+      user-select: none;
+    }
+
+    /* Mobil iyileştirmeleri */
+    @media (max-width: 600px) {
+      h1 { font-size: 24px; }
+      .button { 
+        padding: 18px 14px; 
+        font-size: 16.5px; 
+        min-height: 65px;
+      }
+      .emoji { font-size: 26px; }
+      .container { padding: 8px 12px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>🔥 RAZE SON SORGU PANELİ</h1>
+      <p class="subtitle">2026 • En Son Sorgu & Sızma Paneli</p>
+    </header>
+
+    <div id="menu" class="menu"></div>
+    <div id="result" class="result"></div>
+  </div>
+
+  <!-- Müzik Kontrol -->
+  <div class="music-control" id="musicBtn">🎵 Müzik Durdur</div>
+
+  <!-- Arka Plan Müziği -->
+  <iframe id="musicPlayer" width="1" height="1" 
+    src="https://www.youtube.com/embed/2ech1SkQqBc?autoplay=1&loop=1&playlist=2ech1SkQqBc" 
+    allow="autoplay" style="display:none;"></iframe>
+
+  <script>
+    // Müzik Kontrol
+    let isPlaying = true;
+    const musicBtn = document.getElementById('musicBtn');
+    const musicPlayer = document.getElementById('musicPlayer');
+
+    musicBtn.addEventListener('click', () => {
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        musicPlayer.src = "https://www.youtube.com/embed/2ech1SkQqBc?autoplay=1&loop=1&playlist=2ech1SkQqBc";
+        musicBtn.textContent = "🎵 Müzik Durdur";
+      } else {
+        musicPlayer.src = "https://www.youtube.com/embed/2ech1SkQqBc?autoplay=0";
+        musicBtn.textContent = "🎵 Müziği Aç";
+      }
+    });
+
+    // Sorgu Butonları
+    const sorgular = [
+      {name: "🔍 Ad Soyad", type: "ad_soyad", icon: "🔍"},
+      {name: "👤 T.C Sorgu", type: "tc", icon: "👤"},
+      {name: "👤 T.C Plus", type: "tc_plus", icon: "👤"},
+      {name: "📞 GSM-T.C Sorgu", type: "gsm_tc", icon: "📞"},
+      {name: "🏠 Adres Sorgu", type: "adres", icon: "🏠"},
+      {name: "🏠 Adres Geçmişi", type: "adres_gecmisi", icon: "📜"},
+      {name: "🏘️ Ada Parsel Sorgu", type: "ada_parsel", icon: "🏘️"},
+      {name: "🚗 Plaka Sorgu", type: "plaka", icon: "🚗"},
+      {name: "🚗 Plaka Borç Sorgu", type: "plaka_borc", icon: "🚗"},
+      {name: "💣 SMS Bomber", type: "sms_bomber", icon: "💣"},
+      {name: "📸 Instagram Sızma", type: "instagram_sizma", icon: "📸"},
+      {name: "📞 Whatsapp Sızma", type: "whatsapp_sizma", icon: "📞"},
+      {name: "📝 Galeri Sızma", type: "galeri_sizma", icon: "📝"},
+      {name: "🎥 Kamera Sızma", type: "kamera_sizma", icon: "🎥"},
+      {name: "🏦 İban Sorgu", type: "iban", icon: "🏦"}
+    ];
+
+    const menuDiv = document.getElementById('menu');
+    const resultDiv = document.getElementById('result');
+
+    sorgular.forEach(sorgu => {
+      const btn = document.createElement('button');
+      btn.className = 'button';
+      btn.innerHTML = `<span class="emoji">${sorgu.icon}</span> ${sorgu.name}`;
+      btn.onclick = () => showInput(sorgu);
+      menuDiv.appendChild(btn);
+    });
+
+    function showInput(sorgu) {
+      resultDiv.style.display = 'block';
+      
+      let placeholderText = "Bilgi giriniz";
+      if (sorgu.type.includes("sizma") || sorgu.type === "sms_bomber") placeholderText = "Hedef kullanıcı adı / numara";
+      else if (sorgu.type.includes("plaka")) placeholderText = "Plaka giriniz (örn: 34ABC123)";
+      else if (sorgu.type.includes("adres") || sorgu.type === "ada_parsel") placeholderText = "Adres, TC veya Ad Soyad giriniz";
+
+      let inputHTML = `
+        <h3>${sorgu.name}</h3>
+        <input type="text" id="inputVal" placeholder="${placeholderText}">
+        <button onclick="runQuery('${sorgu.type}')">Başlat</button>
+        <button class="back" onclick="hideResult()">Geri</button>
+      `;
+      resultDiv.innerHTML = inputHTML;
+    }
+
+    function runQuery(type) {
+      const input = document.getElementById('inputVal').value.trim();
+      if (!input) {
+        alert("Lütfen bilgi girin!");
+        return;
+      }
+
+      resultDiv.innerHTML = `<p style="color:#00ffcc; font-size:18px;">🔥 İşlem başlatılıyor...</p>`;
+
+      setTimeout(() => {
+        let html = `<h3>✅ İşlem Başarılı</h3><p><strong>Girdi:</strong> ${input}</p>`;
+        html += `<p>${type.replace('_', ' ').toUpperCase()} tamamlandı.</p>`;
+        html += `<br><button class="back" onclick="hideResult()">Yeni Sorgu Yap</button>`;
+        resultDiv.innerHTML = html;
+      }, 1300);
+    }
+
+    function hideResult() {
+      resultDiv.style.display = 'none';
+    }
+  </script>
+</body>
+</html>
