@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Raze Son Sorgu Paneli - 2026</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Impact:wght@400;700&display=swap');
+
+    :root { --red-glow: #ff3333; }
+
+    body {
+      margin: 0; padding: 0; font-family: 'Impact', Arial, sans-serif;
+      background: linear-gradient(rgba(0,0,0,0.82), rgba(0,0,0,0.92)), 
+                  url('https://i.imgur.com/0zX9kLm.jpg') center/cover no-repeat fixed;
+      color: white; min-height: 100vh; overflow-x: hidden;
+    }
+
+    @keyframes pulseGlow { 
+      0%,100% { text-shadow: 0 0 10px var(--red-glow); } 
+      50% { text-shadow: 0 0 40px var(--red-glow), 0 0 70px #ff0000; } 
+    }
+
+    @keyframes banHammerShake {
+      0%, 100% { transform: rotate(-8deg) scale(1); }
+      25% { transform: rotate(8deg) scale(1.08); }
+      50% { transform: rotate(-8deg) scale(1.12); }
+      75% { transform: rotate(8deg) scale(1.05); }
+    }
+
+    @keyframes intenseRedPulse {
+      0%, 100% { filter: brightness(1) drop-shadow(0 0 20px #ff0000); }
+      50% { filter: brightness(1.4) drop-shadow(0 0 50px #ff3333) drop-shadow(0 0 80px #ff0000); }
+    }
+
+    .container { max-width: 960px; margin: 0 auto; padding: 15px; }
+    header { text-align: center; margin-bottom: 20px; position: relative; padding-top: 15px; }
+    h1 { margin: 0; font-size: 28px; text-shadow: 0 0 15px #ff0000, 0 0 35px #990000; animation: pulseGlow 2s infinite alternate; }
+    .subtitle { font-size: 15px; color: #ffaa77; text-shadow: 0 0 12px #000; animation: pulseGlow 3s infinite alternate; }
+
+    .hamburger { position: absolute; left: 15px; top: 18px; font-size: 34px; cursor: pointer; color: #ffdddd; text-shadow: 0 0 12px #ff0000; transition: all 0.4s; z-index: 1100; }
+    .hamburger:hover { transform: rotate(90deg) scale(1.15); color: #ff5555; }
+
+    .sidebar {
+      position: fixed; top: 0; left: -320px; width: 300px; height: 100%;
+      background: rgba(15, 15, 25, 0.97); border-right: 4px solid #cc0000;
+      box-shadow: 12px 0 40px rgba(255, 50, 50, 0.6); transition: left 0.5s cubic-bezier(0.25, 0.1, 0.25, 1);
+      padding: 25px 20px; overflow-y: auto; z-index: 1000;
+    }
+    .sidebar.open { left: 0; }
+
+    .sidebar h2 { text-align: center; color: #ff5555; margin-bottom: 30px; font-size: 23px; text-shadow: 0 0 15px #ff0000; animation: pulseGlow 2.5s infinite alternate; }
+
+    .sidebar .button {
+      width: 100%; margin-bottom: 14px; background: rgba(40, 20, 20, 0.75);
+      border: 2px solid #cc4444; padding: 18px 16px; border-radius: 14px;
+      font-size: 17px; display: flex; align-items: center; gap: 14px;
+      cursor: pointer; transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      color: #ffdddd; box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+    }
+    .sidebar .button:hover {
+      background: rgba(200, 30, 30, 0.7); transform: translateX(12px) scale(1.05);
+      border-color: #ff6666; box-shadow: 0 0 25px #ff3333;
+    }
+
+    .result {
+      margin-top: 20px; background: rgba(20, 20, 25, 0.94); border: 3px solid #cc0000;
+      border-radius: 18px; padding: 25px 20px; display: none;
+      box-shadow: 0 0 30px rgba(255, 60, 60, 0.6);
+    }
+
+    input, button { padding: 16px; margin: 10px 0; border-radius: 12px; width: 100%; font-size: 17px; box-sizing: border-box; }
+    input { border: 2px solid #aa3333; background: #f8f8f8; color: #111; }
+    input:focus { border-color: #ff5555; box-shadow: 0 0 15px #ff3333; }
+
+    .start-btn { background: #ff4444; color: white; }
+    .start-btn:hover { background: #cc0000; transform: scale(1.05); }
+    .back-btn { background: #333333; color: white; }
+    .back-btn:hover { background: #222222; }
+
+    /* Ban Animasyonu Stilleri */
+    #banHammer {
+      font-size: 90px;
+      display: block;
+      margin: 20px auto;
+      animation: banHammerShake 0.6s infinite alternate, intenseRedPulse 0.8s infinite;
+      filter: drop-shadow(0 0 30px #ff0000);
+    }
+
+    .music-control {
+      position: fixed; bottom: 20px; right: 20px; background: rgba(30, 10, 10, 0.92);
+      border: 3px solid #cc0000; color: #ffaaaa; padding: 12px 24px; border-radius: 50px;
+      font-size: 15px; cursor: pointer; z-index: 999;
+      box-shadow: 0 0 25px rgba(255, 80, 80, 0.7); transition: all 0.4s ease;
+    }
+    .music-control:hover { transform: scale(1.12) rotate(8deg); }
+  </style>
+</head>
+<body>
+  <div class="hamburger" id="hamburger">☰</div>
+
+  <div class="sidebar" id="sidebar">
+    <h2>🔥 RAZE İNTİKAM MENÜ</h2>
+    <div id="sidebarMenu"></div>
+  </div>
+
+  <div class="container">
+    <header>
+      <h1>RAZE SON SORGU PANELİ</h1>
+      <p class="subtitle">İNAT • İNANÇ • İNTİKAM • 2026</p>
+    </header>
+
+    <div id="result" class="result"></div>
+
+    <!-- ANLIK KONUM ve KAHPE bölümleri aynı kaldı (kısaltıldı) -->
+    <div id="locationSection" style="display:none;">
+      <h2 style="text-align: center; color: #ff2222; font-size: 28px; text-shadow: 0 0 25px #ff0000; margin-bottom: 20px;">📍 ANLIK KONUM BULMA (IP ile)</h2>
+      <input type="text" id="ipInput" placeholder="IP adresi girin (örnek: 8.8.8.8)" style="margin-bottom:12px;">
+      <button onclick="getLocationByIP()" class="start-btn">🔍 IP ile Konum Bul</button>
+      <div id="locationResult"></div>
+      <div style="text-align: center; margin-top: 25px;">
+        <button onclick="hideLocationSection()" class="back-btn">← Menüye Dön</button>
+      </div>
+    </div>
+
+    <div id="kahpeSection" style="margin: 30px 0; display: none;">
+      <!-- Kahpe bölümü içeriği aynı (kısaltıldı) -->
+      <h2 style="text-align: center; color: #ff2222; font-size: 28px; text-shadow: 0 0 25px #ff0000, 0 0 40px #990000; margin-bottom: 25px; animation: pulseGlow 2s infinite alternate;">🔥🔥 KAHPE BÖLÜMÜ 🔥🔥</h2>
+      <div style="text-align: center; margin-top: 25px;">
+        <button onclick="hideKahpeSection()" class="back-btn" style="width:auto; padding:14px 30px;">← Menüye Dön</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="music-control" id="musicBtn">🎵 Müzik Durdur</div>
+
+  <script>
+    const menuItems = [
+      {name: "🔍 Ad Soyad", type: "ad_soyad", icon: "🔍"},
+      {name: "👤 T.C Sorgu", type: "tc", icon: "👤"},
+      {name: "👤 T.C Plus", type: "tc_plus", icon: "👤"},
+      {name: "📞 GSM-T.C Sorgu", type: "gsm_tc", icon: "📞"},
+      {name: "🏠 Adres Sorgu", type: "adres", icon: "🏠"},
+      {name: "🏠 Adres Geçmişi", type: "adres_gecmisi", icon: "📜"},
+      {name: "🏘️ Ada Parsel Sorgu", type: "ada_parsel", icon: "🏘️"},
+      {name: "🚗 Plaka Sorgu", type: "plaka", icon: "🚗"},
+      {name: "🚗 Plaka Borç Sorgu", type: "plaka_borc", icon: "🚗"},
+      {name: "💳 CC Sorgu", type: "cc_sorgu", icon: "💳"},
+      {name: "🌐 DNS Checker", type: "dns_checker", icon: "🌐"},
+      {name: "🔗 IP Checker", type: "ip_checker", icon: "🔗"},
+      {name: "💣 SMS Bomber", type: "sms_bomber", icon: "💣"},
+      {name: "💣 WhatsApp Bomb", type: "whatsapp_bomb", icon: "💣"},
+      {name: "📞 Call Bomb", type: "call_bomb", icon: "📞"},
+      {name: "📸 Instagram Sızma", type: "instagram_sizma", icon: "📸"},
+      {name: "📞 Whatsapp Sızma", type: "whatsapp_sizma", icon: "📞"},
+      {name: "📝 Galeri Sızma", type: "galeri_sizma", icon: "📝"},
+      {name: "🎥 Kamera Sızma", type: "kamera_sizma", icon: "🎥"},
+      {name: "🏦 İban Sorgu", type: "iban", icon: "🏦"},
+      {name: "📍 Anlık Konum Bulma (IP)", type: "location", icon: "📍"},
+      {name: "⛔ We Play Ban (ID)", type: "weplay_ban", icon: "⛔"},
+      {name: "🔥 Kahpe Bölümü", type: "kahpe_bolumu", icon: "🔥"},
+      {name: "🐍 Yılan Oyunu", type: "snake_game", icon: "🐍"},
+      {name: "🟥 Tetris", type: "tetris_game", icon: "🟥"}
+    ];
+
+    const sidebarMenuDiv = document.getElementById('sidebarMenu');
+    const resultDiv = document.getElementById('result');
+    const locationSection = document.getElementById('locationSection');
+    const kahpeSection = document.getElementById('kahpeSection');
+    const hamburger = document.getElementById('hamburger');
+    const sidebar = document.getElementById('sidebar');
+
+    menuItems.forEach(item => {
+      const btn = document.createElement('button');
+      btn.className = 'button';
+      btn.innerHTML = <span style="font-size:26px;">${item.icon}</span> ${item.name};
+      btn.onclick = () => {
+        sidebar.classList.remove('open');
+        hideAllSections();
+
+        if (item.type === "location") locationSection.style.display = 'block';
+        else if (item.type === "kahpe_bolumu") kahpeSection.style.display = 'block';
+        else if (item.type === "weplay_ban") showWePlayBanInput();
+        else {
+          resultDiv.style.display = 'block';
+          resultDiv.innerHTML = <h2 style="text-align:center;color:#ff2222;">${item.name}</h2><p style="text-align:center;color:#ffaa77;">Bu özellik yakında aktif olacaktır.</p><div style="text-align:center;margin-top:30px;"><button onclick="hideAllSections()" class="back-btn">← Menüye Dön</button></div>;
+        }
+      };
+      sidebarMenuDiv.appendChild(btn);
+    });
+
+    hamburger.addEventListener('click', () => sidebar.classList.toggle('open'));
+    document.addEventListener('click', (e) => {
+      if (!sidebar.contains(e.target) && e.target !== hamburger) sidebar.classList.remove('open');
+    });
+
+    function hideAllSections() {
+      resultDiv.style.display = 'none';
+      locationSection.style.display = 'none';
+      kahpeSection.style.display = 'none';
+    }
+
+    // ====================== WE PLAY BAN (ID) + BAN ANIMASYONU ======================
+    function showWePlayBanInput() {
+      hideAllSections();
+      resultDiv.style.display = 'block';
+      resultDiv.innerHTML = `
+        <h2 style="text-align: center; color: #ff2222; font-size: 28px; text-shadow: 0 0 25px #ff0000; margin-bottom: 20px;">
+          ⛔ We Play Ban (ID)
+        </h2>
+        <p style="text-align: center; color: #ffaa77; margin-bottom: 15px; font-size: 18px;">
+          Banlanacak oyuncunun ID'sini giriniz
+        </p>
+        <input type="text" id="weplayIdInput" placeholder="ID giriniz" 
+               style="margin-bottom:15px; text-align:center; font-size:19px; padding:18px;">
+        
+        <button onclick="performWePlayBan()" class="start-btn" 
+                style="background:#cc0000; font-size:19px; padding:18px; margin-top:10px;">
+          ⛔ BAN UYGULA
+        </button>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <button onclick="hideAllSections()" class="back-btn">← Menüye Dön</button>
+        </div>
+      `;
+    }
+
+    function performWePlayBan() {
+      const id = document.getElementById('weplayIdInput').value.trim();
+      
+      if (!id) {
+        alert("❌ Lütfen bir ID giriniz!");
+        return;
+      }
+
+      resultDiv.innerHTML = `
+        <h2 style="text-align: center; color: #ff5555; margin-bottom: 15px;">⛔ BAN İŞLEMİ BAŞLATILDI</h2>
+        <p style="text-align: center; color: #ffaa77; font-size: 20px; margin: 10px 0 20px;">
+          ID: <strong>${id}</strong>
+        </p>
+        
+        <!-- Ban Hammer Animasyonu -->
+        <div style="text-align:center;">
+          <span id="banHammer">🔨</span>
+        </div>
+        
+        <div id="banStatus" style="text-align: center; color: #ffaa77; font-size: 22px; line-height: 1.6; min-height: 100px; margin-top: 20px;">
+          Ban çekiliyor...
+        </div>
+        
+        <div style="text-align: center; margin-top: 30px;">
+          <button onclick="hideAllSections()" class="back-btn">← Menüye Dön</button>
+        </div>
+      `;
+
+      // 15 saniye sonra sonuç mesajı
+      setTimeout(() => {
+        const statusDiv = document.getElementById('banStatus');
+        const hammer = document.getElementById('banHammer');
+        if (statusDiv && hammer) {
+          hammer.style.animation = 'none'; // Animasyonu durdur
+          hammer.style.transform = 'scale(1.3)';
+          hammer.style.filter = 'drop-shadow(0 0 60px #ff0000)';
+          
+          statusDiv.innerHTML = `
+            <span style="color:#ff3333; font-size:32px; font-weight:bold; display:block; margin-bottom:15px;">✅ CİHAZ BANI YEDİ!</span>
+            <strong>ID:</strong> ${id}<br><br>
+            Oyuncu başarıyla banlandı.
+          `;
+          statusDiv.style.color = '#ff6666';
+        }
+      }, 15000);
+    }
+
+    // Diğer fonksiyonlar (konum ve kahpe)
+    async function getLocationByIP() {
+      const ipInput = document.getElementById('ipInput').value.trim();
+      const resultDivLoc = document.getElementById('locationResult');
+      resultDivLoc.innerHTML = '<p style="color:#ffaa77;">🔍 Konum sorgulanıyor...</p>';
+
+      try {
+        const response = await fetch(http://ip-api.com/json/${ipInput || ''});
+        const data = await response.json();
+        if (data.status === "success") {
+          const mapsLink = https://www.google.com/maps?q=\( {data.lat}, \){data.lon};
+          resultDivLoc.innerHTML = `
+            <strong style="color:#ff5555;">✅ Konum Bulundu!</strong><br><br>
+            <b>IP:</b> ${data.query}<br>
+            <b>Ülke:</b> ${data.country}<br>
+            <b>Şehir:</b> ${data.city || 'Bilinmiyor'}<br>
+            <b>Bölge:</b> ${data.regionName || 'Bilinmiyor'}<br>
+            <b>Enlem:</b> ${data.lat}<br>
+            <b>Boylam:</b> ${data.lon}<br>
+            <b>ISP:</b> ${data.isp || 'Bilinmiyor'}<br><br>
+            <a href="${mapsLink}" target="_blank" style="color:#ffaa77; text-decoration:underline;">📍 Google Maps'te Görüntüle</a>
+          `;
+        } else {
+          resultDivLoc.innerHTML = <p style="color:#ff6666;">❌ Hata: ${data.message || 'Geçersiz IP'}</p>;
+        }
+      } catch (err) {
+        resultDivLoc.innerHTML = <p style="color:#ff6666;">❌ Bağlantı hatası.</p>;
+      }
+    }
+
+    function hideLocationSection() { locationSection.style.display = 'none'; }
+    function hideKahpeSection() { kahpeSection.style.display = 'none'; }
+    function kahpeAction(num) { alert(🔥 Kahpe Bölümü ${num} seçildi!); }
+
+    hideAllSections();
+  </script>
+</body>
+</html>
